@@ -7,9 +7,7 @@ function App() {
   const BASE_URL = "https://openlibrary.org";
 
   async function fetchBooksBySubject(subject: string) {
-    const res = await fetch(
-      `${BASE_URL}/subjects/${subject}.json?limit=30&offset=2`
-    );
+    const res = await fetch(`${BASE_URL}/subjects/${subject}.json?limit=30`);
     return res.json();
   }
 
