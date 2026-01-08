@@ -1,5 +1,6 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
-import "./App.css";
+import "./index.css";
+import Home from "./pages/Home";
 
 function App() {
   const [subject, setSubject] = useState("");
@@ -39,7 +40,7 @@ function App() {
 
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      {/* <form onSubmit={handleSubmit}>
         <input
           type="text"
           id="subject-input"
@@ -51,7 +52,8 @@ function App() {
         <div>{queryResults.map((query) => query.title)}</div>
         <button type="submit">Search</button>
       </form>
-      <div>{books.map((book) => book.title)}</div>
+      <div>{books.map((book) => book.title)}</div> */}
+      <Home />
     </>
   );
 }
