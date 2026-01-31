@@ -1,20 +1,21 @@
 import { type Book } from "@/components/features/SearchBar";
 import { scoreCandidates } from "@/lib/bookScoring";
+import { setPath } from "@/lib/pathSlice";
 import { useLazySearchBooksQuery } from "@/services/bookSearchApi";
+import type { RootState } from "@/store";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 export function useGeneratePath() {
+  const dispatch = useDispatch();
+  const readingPath = useSelector((state: RootState) => state.path.currentPath);
   const [triggerSearch, { isFetching }] = useLazySearchBooksQuery();
-  const [readingPath, setReadingPath] = useState<Book[]>([]);
 
   const preloadImages = (books: Book[]) => {
     books.forEach((book) => {
       if (book.cover_i) {
-        const link = document.createElement("link");
-        link.rel = "preload";
-        link.as = "image";
-        link.href = `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`;
-        document.head.appendChild(link);
+        const img = new Image();
+        img.src = `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`;
       }
     });
   };
@@ -43,7 +44,7 @@ export function useGeneratePath() {
       const shuffled = highlyRatedBooks.sort(() => Math.random() - 0.5);
       const finalList = shuffled.slice(0, 6);
       preloadImages(finalList);
-      setReadingPath(finalList);
+      dispatch(setPath(finalList));
     } catch (error) {
       console.error("Failed to generate random path", error);
     }
@@ -60,7 +61,7 @@ export function useGeneratePath() {
       const candidates = results.docs;
       const sortedPath = scoreCandidates(seed, candidates).slice(0, 6);
       preloadImages(sortedPath);
-      setReadingPath(sortedPath);
+      dispatch(setPath(sortedPath));
     } catch (error) {
       console.error("Failed to generate reading path", error);
     }

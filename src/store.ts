@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { bookSearchApi } from "./services/bookSearchApi"; // adjust path as needed
+import { bookSearchApi } from "./services/bookSearchApi";
+import pathReducer from "@/lib/pathSlice";
 
 export const store = configureStore({
   reducer: {
     // Add the generated reducer as a specific top-level slice
     [bookSearchApi.reducerPath]: bookSearchApi.reducer,
+    path: pathReducer,
   },
   // Adding the api middleware enables caching, invalidation, polling,
   // and other useful features of `rtk-query`.

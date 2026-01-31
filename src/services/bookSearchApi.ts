@@ -3,6 +3,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const bookSearchApi = createApi({
   reducerPath: "bookSearchApi",
   baseQuery: fetchBaseQuery({ baseUrl: "https://openlibrary.org/" }),
+  keepUnusedDataFor: 300,
   endpoints: (builder) => ({
     searchBooks: builder.query({
       query: (query: string) => {
@@ -11,8 +12,8 @@ export const bookSearchApi = createApi({
     }),
 
     getBooksBySubject: builder.query({
-      query: (subject: string) => {
-        return `subjects/${subject}.json?limit=6`;
+      query: ({ subject, offset }) => {
+        return `subjects/${subject}.json?limit=6&offset=${offset}`;
       },
     }),
 
