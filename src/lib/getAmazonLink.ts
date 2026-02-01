@@ -1,4 +1,4 @@
-import type { Book } from "@/components/features/SearchBar";
+import type { Book } from "@/types";
 
 export function getAmazonLink(book: Book) {
   const BASE_URL = `https://www.amazon.co.uk/s`;

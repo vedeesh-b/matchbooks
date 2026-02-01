@@ -1,15 +1,22 @@
-import { type Book } from "@/components/features/SearchBar";
+import type { Book } from "@/types";
 import { scoreCandidates } from "@/lib/bookScoring";
 import { setPath } from "@/lib/pathSlice";
-import { useLazySearchBooksQuery } from "@/services/bookSearchApi";
+import {
+  useLazySearchBooksQuery,
+  useLazyGetBooksBySubjectQuery,
+} from "@/services/bookSearchApi";
 import type { RootState } from "@/store";
-import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export function useGeneratePath() {
   const dispatch = useDispatch();
   const readingPath = useSelector((state: RootState) => state.path.currentPath);
-  const [triggerSearch, { isFetching }] = useLazySearchBooksQuery();
+  const [triggerSearch, { isFetching: isSearching }] =
+    useLazySearchBooksQuery();
+  const [triggerSubjectSearch, { isFetching: isSubjectFetching }] =
+    useLazyGetBooksBySubjectQuery();
+
+  const isGenerating = isSearching || isSubjectFetching;
 
   const preloadImages = (books: Book[]) => {
     books.forEach((book) => {
@@ -34,17 +41,16 @@ export function useGeneratePath() {
 
     const randomSubject =
       popularSubjects[Math.floor(Math.random() * popularSubjects.length)];
+    const randomOffset = Math.floor(Math.random() * 50);
 
     try {
-      const results = await triggerSearch(`subject:${randomSubject}`).unwrap();
-      console.log("results", results);
-      const highlyRatedBooks: Book[] = results?.docs?.filter(
-        (book: Book) => book.ratings_average >= 3.5,
-      );
-      const shuffled = highlyRatedBooks.sort(() => Math.random() - 0.5);
-      const finalList = shuffled.slice(0, 6);
-      preloadImages(finalList);
-      dispatch(setPath(finalList));
+      const results = await triggerSubjectSearch({
+        subject: randomSubject,
+        offset: randomOffset,
+      }).unwrap();
+      const books: Book[] = results.docs;
+      preloadImages(books);
+      dispatch(setPath(books));
     } catch (error) {
       console.error("Failed to generate random path", error);
     }
@@ -52,8 +58,8 @@ export function useGeneratePath() {
 
   const generatePath = async (seed: Book) => {
     if (!seed) return;
-    const subjectQuery = seed.subjects?.[0]
-      ? `subject:${seed.subjects[0]}`
+    const subjectQuery = seed.subject?.[0]
+      ? `subject:${seed.subject[0]}`
       : `author:${seed.author_name?.[0]}`;
 
     try {
@@ -71,6 +77,6 @@ export function useGeneratePath() {
     generatePath,
     generateRandomPath,
     readingPath,
-    isGenerating: isFetching,
+    isGenerating,
   };
 }

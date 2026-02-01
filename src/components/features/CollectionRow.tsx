@@ -1,5 +1,5 @@
 import { useGetCollectionByQueryQuery } from "@/services/bookSearchApi";
-import type { Book } from "./SearchBar";
+import type { Book } from "@/types";
 import { PathCard } from "./PathGrid";
 
 type CollectionRowProps = {
@@ -15,7 +15,6 @@ export default function CollectionRow({
 }: CollectionRowProps) {
   const { data, isLoading } = useGetCollectionByQueryQuery(query);
   const books = data?.docs || [];
-  console.log(data);
 
   if (isLoading)
     return (

@@ -1,4 +1,4 @@
-import { useRef, useState, type ChangeEvent } from "react";
+import { useState, type ChangeEvent } from "react";
 import { useDebounce } from "@/hooks/useDebounce";
 
 import { useSearchBooksQuery } from "@/services/bookSearchApi";
@@ -17,17 +17,7 @@ import { Item, ItemTitle, ItemDescription, ItemMedia } from "../ui/item";
 import { Badge } from "../ui/badge";
 import { BadgePlus, BookAlert, Shuffle, Star } from "lucide-react";
 import { Spinner } from "../ui/spinner";
-
-export type Book = {
-  isbn: string;
-  title: string;
-  author_name: string[];
-  cover_i: string;
-  ratings_average: number;
-  ratings_count: number;
-  subjects: string[];
-  key: string;
-};
+import type { Book } from "@/types";
 
 export type SearchBarProps = {
   generatePath: (seed: Book) => Promise<void>;
@@ -43,7 +33,7 @@ export default function SearchBar({
   const [searchValue, setSearchValue] = useState("");
   const [bookFound, setBookFound] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
-  const lastGeneratedBook = useRef<string | null>(null);
+  const [lastGeneratedKey, setLastGeneratedKey] = useState<string | null>(null);
 
   const handleGenerate = async () => {
     if (!selectedBook) {
@@ -52,13 +42,10 @@ export default function SearchBar({
       return;
     }
 
-    if (selectedBook.key === lastGeneratedBook.current) {
-      console.log("nope");
-      return;
-    }
+    if (selectedBook.key === lastGeneratedKey) return;
 
     await generatePath(selectedBook);
-    lastGeneratedBook.current = selectedBook.key;
+    setLastGeneratedKey(selectedBook.key);
   };
 
   const debouncedSearchValue = useDebounce({
@@ -78,6 +65,9 @@ export default function SearchBar({
     if (input === "") {
     }
   };
+
+  const isDuplicateSelection = selectedBook?.key === lastGeneratedKey;
+  const isDisabled = isGenerating || (bookFound && isDuplicateSelection);
 
   return (
     <>
@@ -173,7 +163,7 @@ export default function SearchBar({
           className="w-40 py-2 h-12 px-3 cursor-pointer bg-neutral-700 hover:bg-neutral-800 hover:shadow-md"
           data-icon="inline-start"
           onClick={handleGenerate}
-          disabled={isGenerating}
+          disabled={isDisabled}
         >
           {isGenerating ? <Spinner /> : bookFound ? <BadgePlus /> : <Shuffle />}
           {bookFound ? "Generate Path" : "Surprise Me"}

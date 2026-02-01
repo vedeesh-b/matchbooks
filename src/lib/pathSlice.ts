@@ -1,9 +1,9 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { Book } from "@/components/features/SearchBar"; // Ensure this type is exported centrally ideally
+import type { Book } from "@/types";
 
 interface PathState {
   currentPath: Book[];
-  generatedAt: number | null; // useful for cache invalidation if needed
+  generatedAt: number | null;
 }
 
 const initialState: PathState = {

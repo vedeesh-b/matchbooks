@@ -1,13 +1,13 @@
-import type { Book } from "@/components/features/SearchBar";
+import type { Book } from "@/types";
 
 export function calculateSubjectScore(seed: Book, candidate: Book): number {
-  if (!seed.subjects || !candidate.subjects) return 0;
+  if (!seed.subject || !candidate.subject) return 0;
 
   const seedSubjects = new Set(
-    seed.subjects.map((subject) => subject.toLowerCase()),
+    seed.subject.map((subject) => subject.toLowerCase()),
   );
   const candidateSubjects = new Set(
-    candidate.subjects.map((subject) => subject.toLowerCase()),
+    candidate.subject.map((subject) => subject.toLowerCase()),
   );
 
   let subjectIntersection = 0;
@@ -36,6 +36,6 @@ export function scoreCandidates(seed: Book, candidates: Book[]) {
   });
 
   return candidatesScore
-    .filter((book) => book.isbn != seed.isbn && book._score > 0.3)
+    .filter((book) => book.key != seed.key && book._score > 0.3)
     .sort((book1, book2) => book2._score - book1._score);
 }

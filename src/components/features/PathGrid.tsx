@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import type { Book } from "./SearchBar";
+import type { Book } from "@/types";
 import { Button } from "../ui/button";
 import { ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
@@ -37,9 +37,6 @@ export const PathCard = ({ book }: { book: Book }) => {
             animate={{ opacity: imageLoaded ? 1 : 0, x: imageLoaded ? 0 : -15 }}
             transition={{ duration: 0.3 }}
           />
-          {/* <Badge className="absolute top-1 left-5 bg-white/90 text-neutral-800 shadow-sm bg-cyan-100">
-                By Author
-              </Badge> */}
         </div>
         <div className="flex flex-1 flex-col  text-center">
           <h3 className="line-clamp-2 text-lg font-semibold leading-tight text-gray-900">
@@ -76,11 +73,9 @@ export const PathCard = ({ book }: { book: Book }) => {
 export default function PathGrid({ books }: { books: Book[] }) {
   return (
     <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 py-12">
-      {books.length > 0 ? (
-        books.map((book) => <PathCard book={book} />)
-      ) : (
-        <div>No books found.</div>
-      )}
+      {books?.map((book) => (
+        <PathCard book={book} />
+      ))}
     </motion.div>
   );
 }
