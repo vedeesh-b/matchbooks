@@ -1,8 +1,6 @@
 import { useState, type ChangeEvent } from "react";
 import { useDebounce } from "@/hooks/useDebounce";
-
 import { useSearchBooksQuery } from "@/services/bookSearchApi";
-
 import { Field } from "../ui/field";
 import {
   Combobox,
@@ -18,6 +16,28 @@ import { Badge } from "../ui/badge";
 import { BadgePlus, BookAlert, Shuffle, Star } from "lucide-react";
 import { Spinner } from "../ui/spinner";
 import type { Book } from "@/types";
+import styled from "styled-components";
+
+const SearchContainer = styled(Field)`
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+    gap: 1rem;
+  }
+`;
+
+const StyledButton = styled(Button)`
+  width: 100%;
+  height: 3rem;
+
+  @media (min-width: 640px) {
+    width: 10rem;
+  }
+`;
 
 export type SearchBarProps = {
   generatePath: (seed: Book) => Promise<void>;
@@ -50,20 +70,21 @@ export default function SearchBar({
 
   const debouncedSearchValue = useDebounce({
     value: searchValue,
-    delay: 200,
+    delay: 400,
   });
 
-  const { data, isFetching } = useSearchBooksQuery(debouncedSearchValue, {
-    skip: debouncedSearchValue.length < 2,
-  });
+  const { data, isFetching } = useSearchBooksQuery(
+    debouncedSearchValue.trim(),
+    {
+      skip: debouncedSearchValue.length < 3,
+    },
+  );
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
     setSearchValue(input);
     setSelectedBook(null);
     setBookFound(false);
-    if (input === "") {
-    }
   };
 
   const isDuplicateSelection = selectedBook?.key === lastGeneratedKey;
@@ -71,7 +92,7 @@ export default function SearchBar({
 
   return (
     <>
-      <Field orientation="horizontal" className="flex gap-4">
+      <SearchContainer>
         <div className="relative w-full">
           <Combobox
             items={data?.docs}
@@ -88,7 +109,7 @@ export default function SearchBar({
               placeholder="Search books..."
               value={searchValue}
               onChange={handleInputChange}
-              className="h-12 py-2 px-2.5"
+              className="h-12 py-2 px-2.5 w-full"
             />
             <ComboboxContent>
               {isFetching && (
@@ -105,7 +126,7 @@ export default function SearchBar({
                     No books found.
                   </ComboboxEmpty>
                 )}
-              {!isFetching && data?.docs?.length > 0 && (
+              {!isFetching && data?.docs && data?.docs?.length > 0 && (
                 <ComboboxList>
                   {data?.docs?.map((book: Book) => (
                     <ComboboxItem key={book.key} value={book}>
@@ -115,7 +136,11 @@ export default function SearchBar({
                           className="shrink-0 h-24 w-18"
                         >
                           <img
-                            src={`https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`}
+                            src={
+                              book.cover_i
+                                ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`
+                                : "/placeholder.png"
+                            }
                             alt={book.title}
                             className="h-full w-full object-cover rounded-sm bg-neutral-200"
                           />
@@ -159,16 +184,16 @@ export default function SearchBar({
             </ComboboxContent>
           </Combobox>
         </div>
-        <Button
-          className="w-40 py-2 h-12 px-3 cursor-pointer bg-neutral-700 hover:bg-neutral-800 hover:shadow-md"
+        <StyledButton
+          className="cursor-pointer bg-neutral-700 hover:bg-neutral-800 hover:shadow-md"
           data-icon="inline-start"
           onClick={handleGenerate}
           disabled={isDisabled}
         >
           {isGenerating ? <Spinner /> : bookFound ? <BadgePlus /> : <Shuffle />}
           {bookFound ? "Generate Path" : "Surprise Me"}
-        </Button>
-      </Field>
+        </StyledButton>
+      </SearchContainer>
     </>
   );
 }

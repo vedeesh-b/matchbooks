@@ -127,3 +127,7 @@
     @apply font-sans;
   }
 }
+
+nav > div {
+  width: 100%;
+}

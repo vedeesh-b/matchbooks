@@ -1,6 +1,22 @@
 import { useGetCollectionByQueryQuery } from "@/services/bookSearchApi";
 import type { Book } from "@/types";
 import { PathCard } from "./PathGrid";
+import styled from "styled-components";
+
+const ResponsiveGrid = styled.div`
+  display: grid;
+  gap: 1.5rem;
+
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+`;
 
 type CollectionRowProps = {
   title: string;
@@ -30,13 +46,13 @@ export default function CollectionRow({
         </h3>
         <p className="text-gray-600">{description}</p>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+      <ResponsiveGrid>
         {books.slice(0, 4).map((book: Book) => (
           <div key={book.key} className="group cursor-pointer">
             <PathCard book={book} />
           </div>
         ))}
-      </div>
+      </ResponsiveGrid>
     </>
   );
 }

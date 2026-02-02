@@ -5,6 +5,26 @@ import { ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { getAmazonLink } from "@/lib/getAmazonLink";
+import styled from "styled-components";
+
+const GridContainer = styled(motion.div)`
+  display: grid;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  gap: 1.5rem;
+
+  grid-template-columns: 1fr;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+`;
+
+const buttonText = "Buy on Amazon";
 
 const cardVariants = {
   hidden: { opacity: 0, x: -20 },
@@ -29,7 +49,11 @@ export const PathCard = ({ book }: { book: Book }) => {
             <div className="absolute inset-0 bg-neutral-100 animate-pulse" />
           )}
           <motion.img
-            src={`https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`}
+            src={
+              book.cover_i
+                ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`
+                : "/placeholder.png"
+            }
             alt={book.title}
             className="h-full w-auto object-contain shadow-sm transition-transform group-hover:scale-105"
             onLoad={() => setImageLoaded(true)}
@@ -38,13 +62,13 @@ export const PathCard = ({ book }: { book: Book }) => {
             transition={{ duration: 0.3 }}
           />
         </div>
-        <div className="flex flex-1 flex-col  text-center">
-          <h3 className="line-clamp-2 text-lg font-semibold leading-tight text-gray-900">
+        <div className="flex flex-1 flex-col text-center">
+          <h3 className="line-clamp-2 text-lg font-semibold leading-tight text-gray-900 px-2">
             {book.title.length > 25
               ? `${book.title.slice(0, 25)}...`
               : book.title}
           </h3>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-gray-500 pb-2">
             by {book.author_name?.[0] ?? "Unknown"}
           </p>
         </div>
@@ -57,11 +81,11 @@ export const PathCard = ({ book }: { book: Book }) => {
           >
             <Button
               variant={"secondary"}
-              className="w-[50%] py-4 hover:bg-amber-300 rounded-sm"
+              className="w-[80%] md:w-[60%] py-4 hover:bg-amber-300 rounded-sm"
               data-icon="inline-start"
             >
               <ExternalLink />
-              Buy on Amazon
+              {buttonText}
             </Button>
           </a>
         </div>
@@ -72,10 +96,10 @@ export const PathCard = ({ book }: { book: Book }) => {
 
 export default function PathGrid({ books }: { books: Book[] }) {
   return (
-    <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 py-12">
+    <GridContainer>
       {books?.map((book) => (
-        <PathCard book={book} />
+        <PathCard key={book.key} book={book} />
       ))}
-    </motion.div>
+    </GridContainer>
   );
 }

@@ -27,15 +27,18 @@ export function scoreCandidates(seed: Book, candidates: Book[]) {
     const isAuthorMatch = seed.author_name?.some((author) =>
       book.author_name?.includes(author),
     );
-    const authorScore = isAuthorMatch ? 0.5 : 0;
+    const authorScore = isAuthorMatch ? 0.3 : 0;
 
     const subjectScore = calculateSubjectScore(seed, book);
-    const totalScore = authorScore + subjectScore;
+
+    const ratingBoost = (book.ratings_average || 0) * 0.05;
+
+    const totalScore = authorScore + subjectScore + ratingBoost;
 
     return { ...book, _score: totalScore };
   });
 
   return candidatesScore
-    .filter((book) => book.key != seed.key && book._score > 0.3)
+    .filter((book) => book.key !== seed.key)
     .sort((book1, book2) => book2._score - book1._score);
 }

@@ -58,14 +58,26 @@ export function useGeneratePath() {
 
   const generatePath = async (seed: Book) => {
     if (!seed) return;
-    const subjectQuery = seed.subject?.[0]
-      ? `subject:${seed.subject[0]}`
-      : `author:${seed.author_name?.[0]}`;
 
+    const rawSubject = seed.subject?.[0];
+    const rawAuthor = seed.author_name?.[0];
+
+    if (!rawSubject && !rawAuthor) {
+      console.warn("No usable metadata");
+      return;
+    }
+
+    let query = "";
+    if (rawSubject) {
+      query = `subject:"${rawSubject}"`;
+    } else {
+      query = `author:"${rawAuthor}"`;
+    }
     try {
-      const results = await triggerSearch(subjectQuery).unwrap();
+      const results = await triggerSearch(query).unwrap();
       const candidates = results.docs;
       const sortedPath = scoreCandidates(seed, candidates).slice(0, 6);
+      console.log(candidates);
       preloadImages(sortedPath);
       dispatch(setPath(sortedPath));
     } catch (error) {

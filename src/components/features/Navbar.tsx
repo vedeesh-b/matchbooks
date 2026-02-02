@@ -4,14 +4,55 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
-
+import styled from "styled-components";
 import matchbooksLogo from "@/assets/matchbooks-logo.svg";
 import { Link } from "react-router-dom";
 
+const navbarItems = [
+  {
+    title: "Path Generator",
+    path: "/path-generator",
+  },
+  {
+    title: "Top Paths",
+    path: "/top-paths",
+  },
+];
+
+const StyledNav = styled(NavigationMenu)`
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e5e5e5;
+  width: 100%;
+  min-width: 100%;
+  justify-content: space-between;
+  align-items: center;
+
+  @media (min-width: 768px) {
+    padding: 1.5rem 2.5rem;
+  }
+`;
+
+const StyledList = styled(NavigationMenuList)`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+`;
+
+const LinksContainer = styled.div`
+  display: flex;
+  gap: 1rem;
+
+  @media (min-width: 768px) {
+    gap: 1.5rem;
+    margin-left: auto;
+  }
+`;
+
 export default function Navbar() {
   return (
-    <NavigationMenu className="py-6 px-10 border-solid border-neutral-300 border-b-1 min-w-full justify-between items-center">
-      <NavigationMenuList className="flex items-center w-full">
+    <StyledNav>
+      <StyledList>
         <NavigationMenuItem>
           <NavigationMenuLink asChild>
             <Link to="/">
@@ -19,19 +60,18 @@ export default function Navbar() {
             </Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
-        <div className="ml-auto flex gap-6">
-          <NavigationMenuItem>
-            <NavigationMenuLink asChild>
-              <Link to="/path-generator">Path Generator</Link>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <NavigationMenuLink asChild>
-              <Link to="/top-paths">Top Paths</Link>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-        </div>
-      </NavigationMenuList>
-    </NavigationMenu>
+        <LinksContainer>
+          {navbarItems.map((item, i) => (
+            <NavigationMenuItem key={i}>
+              <NavigationMenuLink asChild>
+                <Link to={item.path} className="text-sm font-medium">
+                  {item.title}
+                </Link>
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+          ))}
+        </LinksContainer>
+      </StyledList>
+    </StyledNav>
   );
 }
